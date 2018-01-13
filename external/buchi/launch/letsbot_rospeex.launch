@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- launch rospeex_local (ss/sr/spi) -->
+  <include file="$(find rospeex_launch)/launch/rospeex_local.launch" />
+
+  <node name="letsbot_rospeex" pkg="buchi" type="letsbot_rospeex" respawn="true" output="screen" />
+
+  <node name="audiomonitor" pkg="rospeex_audiomonitor" type="audio_monitor_epd" respawn="true" output="screen" />
+
+</launch>

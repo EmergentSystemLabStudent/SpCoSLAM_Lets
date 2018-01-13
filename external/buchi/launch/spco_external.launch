@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node name="spco_speech" pkg="buchi" type="spco_speech" output="screen" />
+
+  <node name="Image_saver" pkg="buchi" type="CNN_place_LetsBot2.py" output="screen" />
+
+</launch>
