@@ -27,7 +27,7 @@ weightを外部PCから受け取る
     $ rm -f *  
 
 描画のrosbag  
-    $ rosbag record /map /draw_position /draw_space
+    $ rosbag record /map /draw_position /draw_space  
 
 ＜外部PC＞  
 rospeex起動方法  
@@ -36,19 +36,19 @@ rospeex起動方法
 
 spco_speech.cppとCNN_place_LetsBot.pyの実行  
     $ export ROS_MASTER_URI=http://133.19.30.134:11311  
-    $ roslaunch buchi spco_external.launch
+    $ roslaunch buchi spco_external.launch  
 
-particle_saver.pyとmap_saver.pyとrun_SpCoSLAM_Letsbot.pyの実行
-    $ export ROS_MASTER_URI=http://133.19.30.134:11311
-    $ cd ./catkin_ws/src/buchi/src
-    $ ./SpCoSLAM.sh
-    ->trialname?(output_folder) >output_folder_name
+particle_saver.pyとmap_saver.pyとrun_SpCoSLAM_Letsbot.pyの実行  
+    $ export ROS_MASTER_URI=http://133.19.30.134:11311  
+    $ cd ./catkin_ws/src/buchi/src  
+    $ ./SpCoSLAM.sh  
+    ->trialname?(output_folder) >output_folder_name  
 
 
 ---
 このプログラムを使用したものを公開される場合は、必ず引用情報を明記してください。
 
-Reference:
+Reference:  
 Akira Taniguchi, Yoshinobu Hagiwara, Tadahiro Taniguchi, and Tetsunari Inamura, "Online Spatial Concept and Lexical Acquisition with Simultaneous Localization and Mapping", IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS2017), 2017.
 
 Original paper:
