@@ -1,44 +1,49 @@
 # SpCoSLAM_Lets
-SpCoSLAM  移動ロボット(Let’sBot)用ラッパー  
-語彙獲得なし(音声認識の単語辞書既知、教師なし単語分割なし)
+A wrapper of SpCoSLAM for a mobile robot (Let'sBot)
+It can learn the spatial concepts (multimodal place categories) and the environmental map by online learning manner of SpCoSLAM.
 
-ロボット内部用プログラムと外部PC用プログラムがあります。  
-※実装に使用したロボットの仕様上、プログラムを分けていますが、すべて同一デバイス上で動作させるようにすることも可能です。
+Note that this implementation does not include lexical acquisition part.
+(Without unsupervised word segmentation, i.e., updating a language model)
+The word dictionary of the speech recognition is required in advance.
 
-＜ロボット内部＞  
-gmappingの起動  
+There are robot internal programs and external PC programs.
+* Because of the specification of the robot used for mounting, programs are divided, but it is possible to make it all operate on the same device.
+
+
+＜Internal device of the robot＞  
+Start gmapping  
     $ source SpCoSLAM-master/catkin_ws/devel/setup.bash  
     $ roslaunch buchi letsbot_gmapping.launch  
 
-m_countの管理・particleを外部PCに送る  
+Management of `m_count`, and Sending particle data to external PC
     $ cd ~/SpCoSLAM-master/learning  
     $ python csv_send.py  
 
-各種センサー起動（webカメラ・Lider・コントローラー）  
+Start sensors (web camera, Lider, and controller)  
     $ roslaunch buchi spco.launch  
 
-weightを外部PCから受け取る  
+Receive weights of particles from external PC
     $ rosrun buchi data_write.py  
 
-前回のデータが残っていた場合、削除する  
+Delete the previous temporal files if it remains 
     $ cd ~/SpCoSLAM-master/data/test/particle  
     $ rm -f *  
     $ cd ~/SpCoSLAM-master/data/test/weight  
     $ rm -f *  
 
-描画のrosbag  
+[Option] Record a rosbag file for drawing a map, a robot position, and position distribution  
     $ rosbag record /map /draw_position /draw_space  
 
-＜外部PC＞  
-rospeex起動方法  
+＜External PC＞  
+Start rospeex (a speech recognition tool)   
     $ export ROS_MASTER_URI=http://133.19.30.134:11311  
     $ roslaunch buchi letsbot_rospeex.launch  
 
-spco_speech.cppとCNN_place_LetsBot.pyの実行  
+Start `spco_speech.cpp` and `CNN_place_LetsBot.py` 
     $ export ROS_MASTER_URI=http://133.19.30.134:11311  
     $ roslaunch buchi spco_external.launch  
 
-particle_saver.pyとmap_saver.pyとrun_SpCoSLAM_Letsbot.pyの実行  
+Start `particle_saver.py`, `map_saver.py`, and `run_SpCoSLAM_Letsbot.py`  
     $ export ROS_MASTER_URI=http://133.19.30.134:11311  
     $ cd ./catkin_ws/src/buchi/src  
     $ ./SpCoSLAM.sh  
@@ -46,7 +51,7 @@ particle_saver.pyとmap_saver.pyとrun_SpCoSLAM_Letsbot.pyの実行
 
 
 ---
-このプログラムを使用したものを公開される場合は、必ず引用情報を明記してください。
+If you use this program to publish something, please describe the following citation information.
 
 Reference:  
 Akira Taniguchi, Yoshinobu Hagiwara, Tadahiro Taniguchi, and Tetsunari Inamura, "Online Spatial Concept and Lexical Acquisition with Simultaneous Localization and Mapping", IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS2017), 2017.
