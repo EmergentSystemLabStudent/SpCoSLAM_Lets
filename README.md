@@ -50,6 +50,10 @@ Start `particle_saver.py`, `map_saver.py`, and `run_SpCoSLAM_Letsbot.py`
     ->trialname?(output_folder) >output_folder_name  
 
 
+## Other information
+https://github.com/EmergentSystemLabStudent/SpCoSLAM
+
+
 ---
 If you use this program to publish something, please describe the following citation information.
 
@@ -62,4 +66,5 @@ https://arxiv.org/abs/1704.04664
 Sample video:
 https://youtu.be/z73iqwKL-Qk
 
-2018/01/15  Akira Taniguchi
+2018/01/15  Akira Taniguchi  
+2018/04/24  Akira Taniguchi
