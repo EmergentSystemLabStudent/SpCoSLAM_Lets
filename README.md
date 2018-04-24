@@ -7,7 +7,7 @@ Note that this implementation does not include lexical acquisition part.
 The word dictionary of the speech recognition is required in advance.
 
 There are robot internal programs and external PC programs.
-* Because of the specification of the robot used for mounting, programs are divided, but it is possible to make it all operate on the same device.
+Because of the specification of the robot used for mounting, programs are divided, but it is possible to make it all operate on the same device.
 
 
 ＜Internal device of the robot＞  
