@@ -10,47 +10,47 @@ There are robot internal programs and external PC programs.
 Because of the specification of the robot used for mounting, programs are divided, but it is possible to make it all operate on the same device.
 
 
-＜Internal device of the robot＞  
+## ＜Internal device of the robot＞  
 Start gmapping  
-    $ source SpCoSLAM-master/catkin_ws/devel/setup.bash  
-    $ roslaunch buchi letsbot_gmapping.launch  
+    $ `source SpCoSLAM-master/catkin_ws/devel/setup.bash`  
+    $ `roslaunch buchi letsbot_gmapping.launch`  
 
-Management of `m_count`, and Sending particle data to external PC
-    $ cd ~/SpCoSLAM-master/learning  
-    $ python csv_send.py  
+Management of `m_count`, and Sending particle data to external PC  
+    $ `cd ~/SpCoSLAM-master/learning`  
+    $ `python csv_send.py`  
 
 Start sensors (web camera, Lider, and controller)  
-    $ roslaunch buchi spco.launch  
+    $ `roslaunch buchi spco.launch`  
 
-Receive weights of particles from external PC
-    $ rosrun buchi data_write.py  
+Receive weights of particles from external PC  
+    $ `rosrun buchi data_write.py`  
 
-Delete the previous temporal files if it remains 
-    $ cd ~/SpCoSLAM-master/data/test/particle  
-    $ rm -f *  
-    $ cd ~/SpCoSLAM-master/data/test/weight  
-    $ rm -f *  
+Delete the previous temporal files if it remains  
+    $ `cd ~/SpCoSLAM-master/data/test/particle`  
+    $ `rm -f *`  
+    $ `cd ~/SpCoSLAM-master/data/test/weight`  
+    $ `rm -f *`  
 
 [Option] Record a rosbag file for drawing a map, a robot position, and position distribution  
-    $ rosbag record /map /draw_position /draw_space  
+    $ `rosbag record /map /draw_position /draw_space`  
 
-＜External PC＞  
+## ＜External PC＞  
 Start rospeex (a speech recognition tool)   
-    $ export ROS_MASTER_URI=http://133.19.30.134:11311  
-    $ roslaunch buchi letsbot_rospeex.launch  
+    $ `export ROS_MASTER_URI=http://133.19.30.134:11311`  
+    $ `roslaunch buchi letsbot_rospeex.launch`  
 
 Start `spco_speech.cpp` and `CNN_place_LetsBot.py` 
-    $ export ROS_MASTER_URI=http://133.19.30.134:11311  
-    $ roslaunch buchi spco_external.launch  
+    $ `export ROS_MASTER_URI=http://133.19.30.134:11311`  
+    $ `roslaunch buchi spco_external.launch`  
 
 Start `particle_saver.py`, `map_saver.py`, and `run_SpCoSLAM_Letsbot.py`  
-    $ export ROS_MASTER_URI=http://133.19.30.134:11311  
-    $ cd ./catkin_ws/src/buchi/src  
-    $ ./SpCoSLAM.sh  
+    $ `export ROS_MASTER_URI=http://133.19.30.134:11311`  
+    $ `cd ./catkin_ws/src/buchi/src`  
+    $ `./SpCoSLAM.sh`  
     ->trialname?(output_folder) >output_folder_name  
 
 
-## Other information
+## Other information  
 https://github.com/EmergentSystemLabStudent/SpCoSLAM
 
 
