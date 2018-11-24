@@ -1,5 +1,5 @@
 # SpCoSLAM_Lets
-A wrapper of SpCoSLAM for a mobile robot (Let'sBot)
+A wrapper of SpCoSLAM for a mobile robot (Let'sBot or Turtlebot2)  
 It can learn the spatial concepts (multimodal place categories) and the environmental map by online learning manner of SpCoSLAM.
 
 Note that this implementation does not include lexical acquisition part.
@@ -67,4 +67,5 @@ Sample video:
 https://youtu.be/z73iqwKL-Qk
 
 2018/01/15  Akira Taniguchi  
-2018/04/24  Akira Taniguchi
+2018/04/24  Akira Taniguchi (update)  
+2018/11/24  Akira Taniguchi (update)  
