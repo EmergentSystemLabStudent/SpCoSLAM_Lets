@@ -1,14 +1,14 @@
 # SpCoSLAM_Lets
-A wrapper of SpCoSLAM for a mobile robot (Let'sBot or Turtlebot2)  
+A wrapper of SpCoSLAM for a mobile robot (e.g., Let'sBot or Turtlebot2)  
 It can learn the spatial concepts (multimodal place categories) and the environmental map by online learning manner of SpCoSLAM.
 
 Note that this implementation does not include lexical acquisition part.
-(Without unsupervised word segmentation, i.e., updating a language model)
+(Without unsupervised word segmentation, i.e., updating a language model)  
 The word dictionary of the speech recognition is required in advance.
 
 There are robot internal programs and external PC programs.
-Because of the specification of the robot used for mounting, programs are divided, but it is possible to make it all operate on the same device.
-
+Because of the specification of the robot used for mounting, programs are divided, but it is possible to make it all operate on the same device.  
+Please set the folder path appropriately according to your PC environment to be used.
 
 ## ＜Internal device of the robot＞  
 Start gmapping  
@@ -16,7 +16,7 @@ Start gmapping
     $ `roslaunch buchi letsbot_gmapping.launch`  
 
 Management of `m_count`, and Sending particle data to external PC  
-    $ `cd ~/SpCoSLAM-master/learning`  
+    $ `cd ~/SpCoSLAM-master/buchi/src/`  
     $ `python csv_send.py`  
 
 Start sensors (web camera, Lider, and controller)   
@@ -68,4 +68,4 @@ https://youtu.be/z73iqwKL-Qk
 
 2018/01/15  Akira Taniguchi  
 2018/04/24  Akira Taniguchi (update)  
-2018/11/24  Akira Taniguchi (update)  
+2018/11/25  Akira Taniguchi (update)  

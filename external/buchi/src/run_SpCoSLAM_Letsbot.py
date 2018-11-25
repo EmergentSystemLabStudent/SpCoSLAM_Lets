@@ -1,7 +1,6 @@
 #coding:utf-8
-#rosbag play for learning and theaching
-#スペースキー情報を送ることで一時停止と再開を行う。
-#Akira Taniguchi 2017/02/03-
+#This file is the program for learning program
+#Akira Taniguchi 2017/02/03-2018/11/25-
 import sys
 import os
 import shutil
@@ -13,12 +12,12 @@ from std_msgs.msg import String
 from __init__ import *
 
 trialname = sys.argv[1]
-datasetNUM = sys.argv[2]
+#datasetNUM = sys.argv[2]
 
 #init.pyをコピー
 shutil.copy("./__init__.py", datafolder + trialname )
 
-SpCoSLAM = "python ./learnSpCoSLAM3.2.py " + trialname + " " + str(datasetNUM)
+SpCoSLAM = "python ./learnSpCoSLAM1.0.py " + trialname #+ " " + str(datasetNUM)
 
 def callback(msg):
   print "Subprocess SpCoSLAM."

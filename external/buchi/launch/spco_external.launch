@@ -3,6 +3,6 @@
 <launch>
   <node name="spco_speech" pkg="buchi" type="spco_speech" output="screen" />
 
-  <node name="Image_saver" pkg="buchi" type="CNN_place_LetsBot2.py" output="screen" />
+  <node name="Image_saver" pkg="buchi" type="CNN_place_LetsBot3.py" output="screen" />
 
 </launch>

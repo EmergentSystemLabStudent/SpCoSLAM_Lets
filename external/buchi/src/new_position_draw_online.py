@@ -1,19 +1,16 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-#学習した場所領域のサンプルをrviz上に可視化するプログラム
-#作成者 石伏智
-#作成日 2015年12月
+#推定されたロボット位置をrviz上に可視化するプログラム
+#作成者 石伏智 #作成日 2015年12月
 #サンプリング点プロット→ガウスの概形描画に変更（磯部、2016卒論）
-#編集、更新：谷口彰 更新日：2017/02/10
-#mu 2次元、sig 2×2次元版
-#自己位置だけ取得して描画する
+#編集、更新：谷口彰 更新日：2017/02/10-2018/11/25-
+#自己位置だけ取得して描画する(TF、ロボットモデルの表示等で代用できるのであればそちらでも良いはず)
 
 """
 実行前に指定されているフォルダが正しいかをチェックする
-file_read.pyも同様に ！
 
 実行方法
-python place_draw.py (parameterフォルダの絶対パス) (表示する場所領域を指定したい場合は数字を入力)
+python place_draw.py (parameterフォルダの絶対パス) (表示するPosition distribution (Gauss)を指定したい場合は数字を入力)
 
 実行例
 python place_draw.py /home/emlab/py-faster-rcnn/work/gibbs_sampling_program
@@ -38,93 +35,6 @@ import struct
 sys.path.append("lib/")
 from __init__ import *
 
-"""
-def read_result(filename):
-  file_dir = os.chdir(filename)
-  f = open('SBP.txt')
-  line = f.readline() # 1行を文字列として読み込む(改行文字も含まれる)
-  place_num = int(line)
-  return place_num
-"""
-
-def mu_read(filename):
-    all_mu=[]
-    #fp = open(filename+'mu'+maxparticle+".csv", "r") # check
-    #convert = lambda text: int(text) if text.isdigit() else text
-    #alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-    #file.sort(key=alphanum_key)
-    #for f in file:
-    K = 0
-    for line in open(filename+'mu'+str(maxparticle)+".csv", 'r'): #.readlines()
-        mu=[] #(x,y,sin,cos)
-        
-        # readlines()は,ファイルを全て読み込み、1行毎に処理を行う
-        #print line
-        data=line[:].split(',')
-        mu +=[float(data[0])]
-        mu +=[float(data[1])]
-        mu +=[0]#float(data[2])]
-        mu +=[0]#float(data[3])]
-        #print position
-        all_mu.append(mu)
-        K += 1
-    return all_mu, K
-
-
-def sigma_read(filename):
-    all_sigma=[]
-    #file = glob.glob(filename+'/parameter3/sigma/*.txt') # check
-    #convert = lambda text: int(text) if text.isdigit() else text
-    #alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
-    #file.sort(key=alphanum_key)
-    for line in open(filename+'sig'+str(maxparticle)+".csv", 'r'):
-        #sigma=[] #(x,y,sin,cos)
-        data=line[:].split(',')
-        sigma = [[float(data[0]),float(data[1]),0,0],[float(data[2]),float(data[3]),0,0],[0,0,0,0],[0,0,0,0]]
-        # readlines()は,ファイルを全て読み込み、1行毎に処理を行う
-        #line=open(f, 'r').readlines()
-        #i = 0
-        #for l in line:
-        #    sigma_l.append(float(data[0]))
-        #    sigma_l.append(float(data[1]))
-        #    sigma_l.append(float(data[2]))
-        #    sigma_l.append(float(data[3]))
-        #    
-        #sigma.append(sigma_l)
-        #    
-        all_sigma.append(sigma)
-    return all_sigma
-
-"""
-def sampling_read(filename, class_num):
-    c_all_position=[]
-    for c in range(class_num):
-        all_position=[] #すべての自己位置データのリスト
-        
-        file = glob.glob(filename+'/sampling_data3/class'+repr(c)+'/*.txt') # check
-        convert = lambda text: int(text) if text.isdigit() else text 
-        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
-        file.sort(key=alphanum_key)
-        #print file
-        for f in file:
-            position=[] #(x,y,sin,cos)
-            
-            line=open(f, 'r').readlines()
-            #print line
-            data=line[0][:].split(',')
-            position +=[float(data[0])]
-            position +=[float(data[1])]
-            position +=[float(data[2])]
-            position +=[float(data[3])]
-            #print position
-            all_position.append(position)
-        c_all_position.append(all_position)
-    return c_all_position
-"""
-
-# 自作ファイル
-#import file_read as f_r
-#from SBP import read_result
 
 #実験ファイル名trialnameを取得
 trialname = sys.argv[1]
@@ -133,9 +43,6 @@ print trialname
 #step番号を取得
 step = int(sys.argv[2])
 print step
-
-#filename = datafolder+trialname+"/"+ str(step) +"/"
-#filename50 = datafolder+trialname+"/"+ str(50) +"/"
 
 #maxparticle = 0
 #i = 0
@@ -148,8 +55,6 @@ print step
 
 maxparticle = int(sys.argv[3]) #どのIDのパーティクルか
 #pid  = int(sys.argv[3])
-
-
 #filename=sys.argv[1]
 
 #Class_NUM=0#read_result(filename)
@@ -160,26 +65,6 @@ sigma_draw=1  #1 or 0, (0ならば分散を表示しない)
 mu_arrow=0    #矢印を可視化する場合
 COLOR=[
 [0,0,0], #ロボット自己位置用
-[1,0,0],[0,1,0],[0,0,1],[0.5,0.5,0],[0.5,0,0.5], #4
-[0,0.5,0.5],[0.8,0.1,0.1],[0.1,0.8,0.1],[0.1,0.1,0.8],[0.6,0.2,0.2],#9
-[0.2,0.6,0.2],[0.2,0.2,0.6],[0.4,0.3,0.3],[0.3,0.4,0.3],[0.3,0.3,0.4], #14
-[0.7,0.2,0.1],[0.7,0.1,0.2],[0.2,0.7,0.1],[0.1,0.7,0.2],[0.2,0.1,0.7],#19
-[0.1,0.2,0.7],[0.5,0.2,0.3],[0.5,0.3,0.2],[0.3,0.5,0.2],[0.2,0.5,0.3],#24
-[0.3,0.2,0.5],[0.2,0.3,0.5],[0.7,0.15,0.15],[0.15,0.7,0.15],[0.15,0.15,0.7],#29
-[0.6,0.3,0.1],[0.6,0.1,0.3],[0.1,0.6,0.3],[0.3,0.6,0.1],[0.3,0.1,0.6],#34
-[0.1,0.3,0.6],[0.8,0.2,0],[0.8,0,0.2],[0.2,0.8,0],[0,0.8,0.2],#39
-[0.2,0,0.8],[0,0.2,0.8],[0.7,0.3,0],[0.7,0,0.3],[0.3,0.7,0.0],#44
-[0.3,0,0.7],[0,0.7,0.3],[0,0.3,0.7],[0.25,0.25,0.5],[0.25,0.5,0.25], #49
-[1,0,0],[0,1,0],[0,0,1],[0.5,0.5,0],[0.5,0,0.5], #54
-[0,0.5,0.5],[0.8,0.1,0.1],[0.1,0.8,0.1],[0.1,0.1,0.8],[0.6,0.2,0.2],#59
-[0.2,0.6,0.2],[0.2,0.2,0.6],[0.4,0.3,0.3],[0.3,0.4,0.3],[0.3,0.3,0.4], #64
-[0,7,0.2,0.1],[0.7,0.1,0.2],[0.2,0.7,0.1],[0.1,0.7,0.2],[0.2,0.1,0.7],#69
-[0.1,0.2,0.7],[0.5,0.2,0.3],[0.5,0.3,0.2],[0.3,0.5,0.2],[0.2,0.5,0.3],#74
-[0.3,0.2,0.5],[0.2,0.3,0.5],[0.7,0.15,0.15],[0.15,0.7,0.15],[0.15,0.15,0.7],#79
-[0.6,0.3,0.1],[0.6,0.1,0.3],[0.1,0.6,0.3],[0.3,0.6,0.1],[0.3,0.1,0.6],#84
-[0.1,0.3,0.6],[0.8,0.2,0],[0.8,0,0.2],[0.2,0.8,0],[0,0.8,0.2],#89
-[0.2,0,0.8],[0,0.2,0.8],[0.7,0.3,0],[0.7,0,0.3],[0.3,0.7,0.0],#94
-[0.3,0,0.7],[0,0.7,0.3],[0,0.3,0.7],[0.25,0.25,0.5],[0.25,0.5,0.25] #99
 ]
 
 #特定の番号のガウス分布のみ描画したいとき
@@ -188,52 +73,8 @@ try:
 except IndexError:
     Number=None
 
-# 石伏さんはハイパーパラメータの値をパラメータ.txtに保持しているため、以下の処理をしている
-#env_para=np.genfromtxt(filename+"/パラメータ.txt",dtype= None,delimiter =" ")
-#Class_NUM=int(env_para[4][1])
-
-"""
-#=============各場所領域に割り当てられているデータの読みこみ===================
-def class_check():
-    Class_list=[]
-    for i in range(Class_NUM):
-        #f=filename+"/parameter3/class/class"+repr(i)+".txt" # check
-        data=[]
-        # default(エラー)
-        #for line in open(f,'r').readlines():
-        #    print str(line) + "\n\n"
-        #    data.append(int(line))
-        
-        #for line in open(f, 'r'):
-        #    print "読み込み完了"
-        
-        #replaceを使えば簡単にできる
-        #line1=line.split('[') # 始めの"["を除く
-        #line1=line1[1].split(']') # 終わりの"["を除く
-        #line2=line1[0]
-        #print "\nline2:" + str(line2) + "\n"
-        
-        # 場所クラスに中身があるときはtry、中身がないときはexceptに移動
-        #try:
-        #    data = [int(item) for item in line2.split(',')]
-        #except ValueError:
-        #    data = []
-
-        #c=[]
-
-        #for item in data:
-        #    print item
-        #    try:
-        #        num=int(item)
-        #        c.append(num)
-        #    except ValueError:
-        #        pass
-        Class_list.append(data)
-    return Class_list
-"""
 
 def place_draw():
-    # 場所のクラスの割り当てられていない場合は省く→CRPでは割り当てられていないデータは存在しない
     #class_list=class_check()
     #print class_list
     
@@ -246,12 +87,6 @@ def place_draw():
     mu_temp = [[float(sys.argv[4]),float(sys.argv[5]),0,0]]
     sigma_temp = [[[0.02,0,0,0],[0,0.02,0,0],[0,0,0,0],[0,0,0,0]]]
     
-    #最大尤度のパーティクルのmuとsigを読み込み
-    #mumu,Class_NUM = mu_read(filename)
-    #sigsig = sigma_read(filename)
-    #sample = sampling_read(filename, Class_NUM)
-    #print "sigma: ",sigma
-    #print sigsig
     mu_all = mu_temp #+ mumu
     sigma = sigma_temp #+ sigsig
     print mu_all
@@ -266,8 +101,8 @@ def place_draw():
     marker_array=MarkerArray()
     id=0
     for c in data_class:
-        #場所領域の中心値を示す場合
-        #===場所領域の範囲の可視化====================
+        #Positionの中心値を示す場合
+        #===Positionの範囲の可視化====================
         if sigma_draw==1:
             
             marker =Marker()
