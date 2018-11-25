@@ -1,41 +1,30 @@
 #coding:utf-8
-#パラメータ設定ファイル
-#Akira Taniguchi 2017/01/18-
+#This file for setting parameters (パラメータ設定ファイル)
+#Akira Taniguchi 2017/01/18-2018/11/25-
 import numpy as np
 
-####################ファイル####################
-#パスはUbuntu使用時とWin使用時で変更する必要がある。特にUbuntuで動かすときは絶対パスになっているか要確認。
-#win:相対パス、ubuntu:絶対パス
-datafolder   = "/external/buchi/data/"
+####################パス設定####################
+#出力フォルダのパス設定
+datafolder   = "/external/buchi/data/"              #/home/yuki/catkin_ws/src/buchi/data/
+CNNfolder = '/home/yuki/SpCoSLAM-master/PlaceCNN/'  #Folder of CNN model files
+datasetfolder = "/catkin_ws/src/buchi/data/"        #May be the same as datafolder
 
 ####################パラメータ####################
-R = 30 #100        #パーティクル数(run_gmapping.shの値と合わせる必要あり)
+R = 30                    #場所概念側のパーティクル数(gmappingを起動するlaunchファイルの設定の値と合わせる必要あり：未設定時は30)
 dimx = 2                  #xtの次元数（x,y）
 
 ##初期(ハイパー)パラメータ
-alpha0 = 10.0 #20.00              #場所概念のindexのCRPハイパーパラメータ
-gamma0 = 1.0              #位置分布のindexのCRPハイパーパラメータ
-beta0 = 0.01 #0.2               #場所の名前Wのハイパーパラメータ
-chi0  = 1.0 #0.2               #画像特徴のハイパーパラメータ
-k0 = 1e-3                  #μのパラメータ
-m0 = np.zeros(dimx)     #μのパラメータ
-V0 = np.eye(dimx)*2 #*1000              #Σのパラメータ
-n0 = 3.0 #2.0 #3.0                    #Σのパラメータ（＞次元数）
+##事後分布（∝尤度×事前分布）の計算式（参考）：https://en.wikipedia.org/wiki/Conjugate_prior
+alpha0 = 10.0             #場所概念のindexの多項分布P(Ct)のCRPハイパーパラメータ
+gamma0 = 1.0              #位置分布のindexの多項分布P(it)のCRPハイパーパラメータ
+beta0 = 0.01              #場所の名前の多項分布P(W)のハイパーパラメータ
+chi0  = 1.0               #画像特徴の多項分布P(φ)のハイパーパラメータ
+k0 = 1e-3                 #ガウス分布P(μ)のハイパーパラメータ（μの事前分布の影響度合い）
+m0 = np.zeros(dimx)       #ガウス分布P(μ)のハイパーパラメータ（平均ベクトルに対応）
+V0 = np.eye(dimx)*2       #逆ウィシャート分布p(Σ)のハイパーパラメータ（共分散行列に対応）
+n0 = 3.0                  #逆ウィシャート分布p(Σ)のハイパーパラメータ［＞次元数］（Σの事前分布の影響度合い）
 
-
-#latticelmパラメータ
-knownn = 3#2 #[2,3,4] #          #言語モデルのn-gram長 (3)
-unkn   = 3#2 #[3,4] #            #綴りモデルのn-gram長 (3)
-annealsteps  = 3 #10#[3, 5,10]    #焼き鈍し法のステップ数 (3)
-anneallength = 5 #15#[5,10,15]    #各焼き鈍しステップのイタレーション数 (5)
-burnin   = 100 #100     #burn-inのイタレーション数 (20)
-samps    = 100 #100     #サンプルの回数 (100)
-samprate = 100 #100     #サンプルの間隔 (1, つまり全てのイタレーション)
-ramdoman = 5 #0#1 #焼きなましパラメータをランダムにする（最大値：各パラメータ値＋randoman）
-
-
-
-#パーティクルのクラス（構造体）
+####################パーティクルのクラス（構造体）####################
 class Particle:
   def __init__(self,id,x,y,theta,weight,pid):
     self.id = id
@@ -47,10 +36,7 @@ class Particle:
     #self.Ct = -1
     #self.it = -1
 
-
-#Juliusパラメータ
-#Juliusフォルダのsyllable.jconf参照
-
+####################オプション設定(暫定不可)####################
 UseFT = 1#1       #画像特徴を使う場合（１）、使わない場合（０）
 UseLM = 1#1       #言語モデルを更新する場合（１）、しない場合（０）
 
@@ -73,7 +59,10 @@ elif CNNmode == 4:
   DimImg = 1183  #画像特徴の次元数
   
 
-####################不必要(暫定)####################
+####################不必要####################
+"""
+#Juliusパラメータ
+#Juliusフォルダのsyllable.jconf参照
 JuliusVer = "v4.4" #"v.4.3.1"
 if (JuliusVer ==  "v4.4"):
   Juliusfolder = "/Julius/dictation-kit-v4.4/"
@@ -100,16 +89,13 @@ correct_data = 'SpCoSLAM_human.csv'  #データごとの正解の文章（単語
 correct_data_SEG = 'SpCoSLAM_SEG.csv'  #データごとの正解の文章（単語列、区切り文字つき）(./data/)
 correct_name = 'name_correct.csv'  #データごとの正解の場所の名前（音素列）
 
+NbestNum = 10 #n-bestのｎをどこまでとるか（n<=10）
 N_best_number = 10  #PRR評価用のN-bestのN
 margin = 10*0.05 # 地図のグリッドと位置の値の関係が不明のため(0.05m/grid)*margin(grid)=0.05*margin(m)
-
 
 ##rosbag data playing speed (normal = 1.0)
 rosbagSpeed = 0.5#2
 
-#latticelm or NPYLM (SpCoSLAM_NPYLM.shを実行)
-#latticeLM = 1     #latticelm(1), NPYLM(0)
-NbestNum = 10 #n-bestのｎをどこまでとるか（n<=10）
-
 #L = 100                  #場所概念の数50#
 #K = 100                  #位置分布の数50#
+"""

@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-#学習した場所領域のサンプルをrviz上に可視化するプログラム
-#作成者 石伏智
-#作成日 2015年12月
+#学習した場所概念の位置分布（ガウス分布）をrviz上に可視化するプログラム
+#作成者 石伏智 #作成日 2015年12月
 #サンプリング点プロット→ガウスの概形描画に変更（磯部、2016卒論）
-#編集、更新：谷口彰 更新日：2017/02/10
+#編集、更新：谷口彰 更新日：2017/02/10-2018/11/25-
 #mu 2次元、sig 2×2次元版
-#自己位置も取得して描画するのは別プログラム
+#自己位置を取得して描画するのは別プログラム
 
 """
 実行前に指定されているフォルダが正しいかをチェックする
-file_read.pyも同様に ！
 
 実行方法
-python place_draw.py (parameterフォルダの絶対パス) (表示する場所領域を指定したい場合は数字を入力)
+python place_draw.py (parameterフォルダの絶対パス) (表示するPosition distribution (Gauss)を指定したい場合は数字を入力)
 
 実行例
 python place_draw.py /home/emlab/py-faster-rcnn/work/gibbs_sampling_program
@@ -38,14 +36,6 @@ import struct
 sys.path.append("lib/")
 from __init__ import *
 
-"""
-def read_result(filename):
-  file_dir = os.chdir(filename)
-  f = open('SBP.txt')
-  line = f.readline() # 1行を文字列として読み込む(改行文字も含まれる)
-  place_num = int(line)
-  return place_num
-"""
 
 def mu_read(filename):
     all_mu=[]
@@ -56,15 +46,15 @@ def mu_read(filename):
     #for f in file:
     K = 0
     for line in open(filename+'mu'+str(maxparticle)+".csv", 'r'): #.readlines()
-        mu=[] #(x,y,sin,cos)
-        
         # readlines()は,ファイルを全て読み込み、1行毎に処理を行う
         #print line
         data=line[:].split(',')
-        mu +=[float(data[0])]
-        mu +=[float(data[1])]
-        mu +=[0]#float(data[2])]
-        mu +=[0]#float(data[3])]
+        mu=[float(data[0]),float(data[1]),0,0] #(x,y,sin,cos)
+        #mu=[] #(x,y,sin,cos)
+        #mu +=[float(data[0])]
+        #mu +=[float(data[1])]
+        #mu +=[0]#float(data[2])]
+        #mu +=[0]#float(data[3])]
         #print position
         all_mu.append(mu)
         K += 1
@@ -122,10 +112,6 @@ def sampling_read(filename, class_num):
     return c_all_position
 """
 
-# 自作ファイル
-#import file_read as f_r
-#from SBP import read_result
-
 #実験ファイル名trialnameを取得
 trialname = sys.argv[1]
 print trialname
@@ -135,7 +121,6 @@ step = int(sys.argv[2])
 print step
 
 filename = datafolder+trialname+"/"+ str(step) +"/"
-#filename50 = datafolder+trialname+"/"+ str(50) +"/"
 
 #maxparticle = 0
 #i = 0
@@ -148,8 +133,6 @@ filename = datafolder+trialname+"/"+ str(step) +"/"
 
 maxparticle = int(sys.argv[3]) #どのIDのパーティクルか
 #pid  = int(sys.argv[3])
-
-
 #filename=sys.argv[1]
 
 #Class_NUM=0#read_result(filename)
@@ -192,51 +175,11 @@ except IndexError:
 #env_para=np.genfromtxt(filename+"/パラメータ.txt",dtype= None,delimiter =" ")
 #Class_NUM=int(env_para[4][1])
 
-"""
-#=============各場所領域に割り当てられているデータの読みこみ===================
-def class_check():
-    Class_list=[]
-    for i in range(Class_NUM):
-        #f=filename+"/parameter3/class/class"+repr(i)+".txt" # check
-        data=[]
-        # default(エラー)
-        #for line in open(f,'r').readlines():
-        #    print str(line) + "\n\n"
-        #    data.append(int(line))
-        
-        #for line in open(f, 'r'):
-        #    print "読み込み完了"
-        
-        #replaceを使えば簡単にできる
-        #line1=line.split('[') # 始めの"["を除く
-        #line1=line1[1].split(']') # 終わりの"["を除く
-        #line2=line1[0]
-        #print "\nline2:" + str(line2) + "\n"
-        
-        # 場所クラスに中身があるときはtry、中身がないときはexceptに移動
-        #try:
-        #    data = [int(item) for item in line2.split(',')]
-        #except ValueError:
-        #    data = []
-
-        #c=[]
-
-        #for item in data:
-        #    print item
-        #    try:
-        #        num=int(item)
-        #        c.append(num)
-        #    except ValueError:
-        #        pass
-        Class_list.append(data)
-    return Class_list
-"""
 
 def place_draw():
-    # 場所のクラスの割り当てられていない場合は省く→CRPでは割り当てられていないデータは存在しない
+    # 場所のクラスの割り当てられていない場合は省く→CRPでは割り当てられていないデータは存在しないはず
     #class_list=class_check()
     #print class_list
-    
     
     pub = rospy.Publisher('draw_space',MarkerArray, queue_size = 10)
     rospy.init_node('draw_spatial_concepts', anonymous=True)
@@ -268,8 +211,8 @@ def place_draw():
     marker_array=MarkerArray()
     id=0
     for c in data_class:
-        #場所領域の中心値を示す場合
-        #===場所領域の範囲の可視化====================
+        #Position distribution (Gauss)の中心値を示す場合
+        #===Position distribution (Gauss)の範囲の可視化====================
         if sigma_draw==1:
             
             marker =Marker()

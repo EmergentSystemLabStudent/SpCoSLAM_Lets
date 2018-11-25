@@ -1,9 +1,11 @@
-SpCoSLAM
-移動ロボット(Let’sBot)用ラッパー
+SpCoSLAM  
+移動ロボット(Let’sBot/Turtlebot2)用ラッパー
+場所概念と環境地図のオンライン学習が可能
 語彙獲得なし(音声認識の単語辞書既知、教師なし単語分割なし)
 
 ロボット内部用プログラムと外部PC用プログラムがあります。
 ※実装に使用したロボットの仕様上、プログラムを分けていますが、すべて同一デバイス上で動作させるようにすることも可能です。
+フォルダのパスは適宜、使用される環境に合わせて設定してください。
 
 ＜ロボット内部＞
 gmappingの起動
@@ -11,7 +13,7 @@ $ source SpCoSLAM-master/catkin_ws/devel/setup.bash
 $ roslaunch buchi letsbot_gmapping.launch
 
 m_countの管理・particleを外部PCに送る
-$ cd ~/SpCoSLAM-master/learning
+$ cd ~/SpCoSLAM-master/buchi/src/
 $ python csv_send.py
 
 各種センサー起動（webカメラ・Lider・コントローラー）
@@ -45,6 +47,11 @@ $ ./SpCoSLAM.sh
 ->trialname?(output_folder) >output_folder_name
 
 
+## Other information  
+以下のリングは著者がIROS2017の論文の実験で使用したソースコードです。
+https://github.com/EmergentSystemLabStudent/SpCoSLAM
+
+
 ---
 このプログラムを使用したものを公開される場合は、必ず引用情報を明記してください。
 
@@ -58,3 +65,4 @@ Sample video:
 https://youtu.be/z73iqwKL-Qk
 
 2018/01/15  Akira Taniguchi
+2018/11/25  Akira Taniguchi (update)

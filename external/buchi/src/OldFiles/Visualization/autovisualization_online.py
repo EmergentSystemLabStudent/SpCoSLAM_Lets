@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-#地図と場所概念を自動で可視化、保存
-#Akira Taniguchi 2017/02/28
+#自己位置と場所概念(位置分布)の可視化用プログラム（実行不可）
+#Akira Taniguchi 2017/02/28 - 2017/09/01
 import sys
 import os
 import random
@@ -144,21 +144,24 @@ for m in range(1,end_m_count+1):#5,16):#5,7):#
   
   ##run_mapviewer.shを実行（trailname と m_countを指定）
   #map = "./run_mapviewer.sh "+trialname+" "+str(m)
-  map = "rosrun map_server map_server /home/akira/Dropbox/SpCoSLAM/data/"+ trialname+"/map/map"+str(m)+".yaml"
-  p = subprocess.Popen(map, shell=True)
+  #map = "rosrun map_server map_server /home/akira/Dropbox/SpCoSLAM/data/"+ trialname+"/map/map"+str(m)+".yaml"
+  #p = subprocess.Popen(map, shell=True)
   print list[s][0],m,s+1
   ##if (現在のm_countのstep == step):
   #if (m in m_list): #list[s][0] == m):
+  ##########ここを実装すればよい↓##########
+  ##オプション（trailname m_count particleのID ロボットのx座標 y座標）
   drawposition = "python ./new_position_draw_online.py "+trialname+" "+str(m)+" "+str(maxparticle)+" "+str(XTMAX[m-1][0])+" "+str(XTMAX[m-1][1])
   print drawposition
   p3 = subprocess.Popen(drawposition, shell=True)
   
   for s in range(len(list)):
    if(list[s][0] == m):
-    ###new_place_draw_online.pyを実行（trailname と stepを指定）
+    ###new_place_draw_online.pyを実行（trialname 教示回数 particleのID）
     drawplace = "python ./new_place_draw_online.py "+trialname+" "+str(list[s][1])+" "+str(pid[s]) #+" "+str(particle[s][0])+" "+str(particle[s][1])
     print drawplace
     p2 = subprocess.Popen(drawplace, shell=True)
+  ##########ここを実装すればよい↑##########
     #s = s+1
   time.sleep(2.0)
 

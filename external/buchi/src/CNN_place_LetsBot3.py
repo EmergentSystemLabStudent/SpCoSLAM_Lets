@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+# CNNモデルファイルを毎回読み込まない形に変更。出力ファイル保存先変更。(Akira Taniguchi 2018/11/25)
 import sys, os, os.path, caffe
 import glob
 import rospy
@@ -17,53 +18,51 @@ def Makedir(dir):
 	except:
 		pass
 
-CNNfolder = '/home/yuki/SpCoSLAM-master/PlaceCNN/'
+# CNNfolder = '/home/yuki/SpCoSLAM-master/PlaceCNN/' #Go to "__init__,py"
 
 if (Descriptor == "CNN_Place205"):
-	#CNN_FILE = "placesCNN"
 	#FULL PATH
 	MEAN_FILE = CNNfolder + 'placesCNN/places205_mean.npy'
-	#'/home/akira/Caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy'
 	MODEL_FILE = CNNfolder + 'placesCNN/places205CNN_deploy.prototxt'
-	#'/home/akira/Caffe/examples/imagenet/imagenet_feature.prototxt'
 	PRETRAINED = CNNfolder + 'placesCNN/places205CNN_iter_300000.caffemodel'
-	#'/home/akira/Caffe/examples/imagenet/caffe_reference_imagenet_model'
-elif (Descriptor == "hybridCNN"):
-	#CNN_FILE = "hybridCNN"
-	#FULL PATH
-	MEAN_FILE = CNNfolder + 'hybridCNN/hybridCNN__mean.npy'
-	#'/home/akira/Caffe/python/caffe/imagenet/ilsvrc_2012_mean.npy'
-	MODEL_FILE = CNNfolder + 'hybridCNN/hybridCNN_deploy.prototxt'
-	#'/home/akira/Caffe/examples/imagenet/imagenet_feature.prototxt'
-	PRETRAINED = CNNfolder + 'hybridCNN/hybridCNN_iter_700000.caffemodel'
- 	#'/home/akira/Caffe/examples/imagenet/caffe_reference_imagenet_model'
+elif (Descriptor == "CNN_Place365"):
+  #FULL PATH
+  MEAN_FILE = CNNfolder + 'places365resnet/places365CNN_mean.npy'
+  MODEL_FILE = CNNfolder + 'places365resnet/deploy_resnet152_places365.prototxt'
+  PRETRAINED = CNNfolder + 'places365resnet/resnet152_places365.caffemodel'
 
 LAYER = 'prob' #'fc6wi'
 INDEX = 4
+
+for line in open( datafolder + 'trialname.txt', 'r'):
+    itemList = line[:].split(',')
+    trialname = itemList[0]
+#Makedir(datafolder + trialname + "/image/")
 
 class CNN_Place(object):
 
 	# トピックが送られてきた時に画像を保存
 	def recog_callback(self, hoge):
-    
+		
+		#count_paddedの値と実際の教示step数がずれると危ういかも
 		self.count += 1
 		count_padded = '%05d' % self.count
-
-		trialname = datasetfolder + "image/"
+		
+		#ImageFile = datafolder + trialname + "/img/"
 		#"/home/yuki/catkin_ws/src/buchi/data/image/"
-		write_file_name = trialname + count_padded + ".jpg"
+		write_file_name = datafolder + trialname + "/img/" + count_padded + ".jpg"
 		cv2.imwrite(write_file_name, self.frame)
 
-		print write_file_name
+		print(write_file_name)
 		
 		#timename = write_file_name[len(trialname):-4]
-	
+		
 		image = caffe.io.load_image(write_file_name)
 		net.predict([ image ])
 		feat = net.blobs[LAYER].data[INDEX].flatten().tolist()
 		#print(','.join(map(str, feat)))
-		trialname = datasetfolder
-		fp = open(trialname+ Descriptor + "/" + count_padded+'.csv','w')
+		#trialname = datasetfolder
+		fp = open(datafolder + trialname + "/img/ft" + str(int(count_padded)) + '.csv','w')
 		fp.write(','.join(map(str, feat)))
 		fp.close()
 		print('This image was extracted by CNN.\n')
@@ -71,7 +70,6 @@ class CNN_Place(object):
 
 	# 画像が読み込まれるごとに画像の情報を保持
 	def image_callback(self, ros_image):
-
 		# Create the cv_bridge object
 		# cv_bridge（OpenCVとROSの相互変換のための） オブジェクトの作成
 		bridge = CvBridge()
@@ -81,10 +79,9 @@ class CNN_Place(object):
 		try:
 			self.frame = bridge.imgmsg_to_cv2(ros_image, "bgr8")
 		except CvBridgeError, e:
-			print e
+			print(e)
 
 	def __init__(self):
-
 		rospy.Subscriber("/image/signal", String, self.recog_callback, queue_size=1)
 		rospy.Subscriber("/usb_cam/image_raw", Image, self.image_callback, queue_size=1)
 		self.count = 0
