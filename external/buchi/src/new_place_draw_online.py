@@ -85,32 +85,6 @@ def sigma_read(filename):
         all_sigma.append(sigma)
     return all_sigma
 
-"""
-def sampling_read(filename, class_num):
-    c_all_position=[]
-    for c in range(class_num):
-        all_position=[] #すべての自己位置データのリスト
-        
-        file = glob.glob(filename+'/sampling_data3/class'+repr(c)+'/*.txt') # check
-        convert = lambda text: int(text) if text.isdigit() else text 
-        alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
-        file.sort(key=alphanum_key)
-        #print file
-        for f in file:
-            position=[] #(x,y,sin,cos)
-            
-            line=open(f, 'r').readlines()
-            #print line
-            data=line[0][:].split(',')
-            position +=[float(data[0])]
-            position +=[float(data[1])]
-            position +=[float(data[2])]
-            position +=[float(data[3])]
-            #print position
-            all_position.append(position)
-        c_all_position.append(all_position)
-    return c_all_position
-"""
 
 #実験ファイル名trialnameを取得
 trialname = sys.argv[1]
