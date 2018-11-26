@@ -1,6 +1,6 @@
 #coding:utf-8
 #map saver for each m_count
-#Akira Taniguchi 2017/02/04-
+#Akira Taniguchi 2017/02/04-2018/11/25-
 import sys
 import os
 import signal
@@ -16,23 +16,15 @@ trialname = sys.argv[1]
 #datasetNUM = sys.argv[2]
 
 mapsave = "rosrun map_server map_saver -f "
-clocktime = 0.0
-
-#trialname = "test" #raw_input("trialname?(output_folder) >")
-#datasetNUM = 0 #raw_input("dataset_number?(0:albert,1:MIT) >")
-#datasetname = datasets[int(datasetNUM)]
-#datasetPATH = datasetfolder + datasetname
-
+#clocktime = 0.0
 m_temp = 0
 
 def callback(message):
-
   global m_temp
   #print clocktime,rospy.get_time()
   
   #m_countのindexは1から始まる
   #while (os.path.exists( datafolder + trialname + "/particle/" + str(message.data) + ".csv" ) == True):
-   
     #print "m_count",message.data, "m_temp",m_temp
   
   if (m_temp != message.data):
@@ -49,8 +41,6 @@ def callback(message):
 time.sleep(2.0)
 rospy.init_node('map_savering')
 sub = rospy.Subscriber('/m_count', Int8, callback)
-#rosbagがpauseの間はずっと同じ時刻を受け取り続ける
-
 
 rospy.spin()
 

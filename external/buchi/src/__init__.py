@@ -1,6 +1,6 @@
 #coding:utf-8
 #This file for setting parameters (パラメータ設定ファイル)
-#Akira Taniguchi 2017/01/18-2018/11/25-
+#Akira Taniguchi 2017/01/18-2018/11/26-
 import numpy as np
 
 ####################パス設定####################
@@ -17,12 +17,13 @@ dimx = 2                  #xtの次元数（x,y）
 ##事後分布（∝尤度×事前分布）の計算式（参考）：https://en.wikipedia.org/wiki/Conjugate_prior
 alpha0 = 10.0             #場所概念のindexの多項分布P(Ct)のCRPハイパーパラメータ
 gamma0 = 1.0              #位置分布のindexの多項分布P(it)のCRPハイパーパラメータ
-beta0 = 0.01              #場所の名前の多項分布P(W)のハイパーパラメータ
-chi0  = 1.0               #画像特徴の多項分布P(φ)のハイパーパラメータ
+beta0 = 0.1               #場所の名前の多項分布P(W)のハイパーパラメータ
+chi0  = 0.1               #画像特徴の多項分布P(φ)のハイパーパラメータ
 k0 = 1e-3                 #ガウス分布P(μ)のハイパーパラメータ（μの事前分布の影響度合い）
 m0 = np.zeros(dimx)       #ガウス分布P(μ)のハイパーパラメータ（平均ベクトルに対応）
 V0 = np.eye(dimx)*2       #逆ウィシャート分布p(Σ)のハイパーパラメータ（共分散行列に対応）
 n0 = 3.0                  #逆ウィシャート分布p(Σ)のハイパーパラメータ［＞次元数］（Σの事前分布の影響度合い）
+k0m0m0 = k0*np.dot(np.array([m0]).T,np.array([m0]))
 
 ####################パーティクルのクラス（構造体）####################
 class Particle:
@@ -37,15 +38,15 @@ class Particle:
     #self.it = -1
 
 ####################オプション設定(暫定不可)####################
-UseFT = 1#1       #画像特徴を使う場合（１）、使わない場合（０）
-UseLM = 1#1       #言語モデルを更新する場合（１）、しない場合（０）
+SaveParam = 1   #ステップごとに学習結果をファイル保存する（１）、しない（０）
 
-CNNmode = 3     #CNN最終層1000次元(1)、CNN中間層4096次元(2)、PlaceCNN最終層205次元(3)、SIFT(0)
+wic = 1         #1:wic重みつき(理論的にはこちらがより正しい)、0:wic重みなし(Orignal paper of SpCoSLAM)
+UseFT = 1       #画像特徴を使う場合（１）、使わない場合（０）
+UseLM = 1       #言語モデルを更新する場合（１）、しない場合（０）[Without update language modelのため無関係]
 
-if CNNmode == 0:
-  Descriptor = "SIFT_BoF"
-  DimImg = 100  #画像特徴の次元数
-elif CNNmode == 1:
+CNNmode = 3     #AlexNet最終層(1)、AlexNet中間層(2)、Places-CNN最終層(3)、Places2-CNN最終層(4)、hybridCNN最終層
+
+if CNNmode == 1:
   Descriptor = "CNN_softmax"
   DimImg = 1000 #画像特徴の次元数
 elif CNNmode == 2:
@@ -55,8 +56,11 @@ elif CNNmode == 3:
   Descriptor = "CNN_Place205"
   DimImg = 205  #画像特徴の次元数
 elif CNNmode == 4:
+  Descriptor = "CNN_Place365"
+  DimImg = 365  #画像特徴の次元数
+elif CNNmode == 5:
   Descriptor = "hybridCNN"
-  DimImg = 1183  #画像特徴の次元数
+  DimImg = 1183  #画像特徴の次元数	
   
 
 ####################不必要####################

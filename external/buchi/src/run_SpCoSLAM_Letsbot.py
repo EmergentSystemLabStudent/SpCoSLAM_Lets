@@ -14,7 +14,7 @@ from __init__ import *
 trialname = sys.argv[1]
 #datasetNUM = sys.argv[2]
 
-#init.pyをコピー
+#Copy of "__init__.py"
 shutil.copy("./__init__.py", datafolder + trialname )
 
 SpCoSLAM = "python ./learnSpCoSLAM1.0.py " + trialname #+ " " + str(datasetNUM)
