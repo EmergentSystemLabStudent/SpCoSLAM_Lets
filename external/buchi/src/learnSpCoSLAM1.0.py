@@ -784,12 +784,16 @@ if __name__ == '__main__':
     #print trialname
     
     Xp,step,m_count,CT,IT = ParticleSearcher(trialname)
+    for i in xrange(R):
+      while (0 in CT[i]) or (0 in IT[i]):
+        print "Error! 0 in CT,IT",CT,IT
+        Xp,step,m_count,CT,IT = ParticleSearcher(trialname)
     print "step", step, "m_count", m_count
     
-    teachingtime = []
+    #teachingtime = []
     #for line in open( datasetfolder + datasetname + 'teaching.csv', 'r'):
-      #itemList = line[:].split(',')
-    teachingtime.append(float(1))
+    #  itemList = line[:].split(',')
+    #teachingtime.append(float(1))
     
     #clocktime = float(1) ##
     
@@ -799,7 +803,7 @@ if __name__ == '__main__':
     Makedir( filename )
     
     p_weight_log = np.array([0.0 for i in xrange(R)])
-    p_weight = [0.0 for i in xrange(R)]
+    p_weight = np.array([0.0 for i in xrange(R)])
     W_list   = [[] for i in xrange(R)]
     
     if (UseFT == 1):
@@ -829,7 +833,7 @@ if __name__ == '__main__':
     print "--------------------------------------------------" ###############
     #logの最大値を引く処理
     print p_weight_log
-    logmax = max(p_weight_log)
+    logmax = np.max(p_weight_log)
     p_weight_log = p_weight_log - logmax  #np.arrayのため
     
     WriteWeightData(trialname, m_count, p_weight_log)
@@ -837,7 +841,7 @@ if __name__ == '__main__':
     #print p_weight_log
     #weightの正規化
     p_weight = np.exp(p_weight_log)
-    sum_weight = sum(p_weight)
+    sum_weight = np.sum(p_weight)
     p_weight = p_weight / sum_weight
     print "Weight:",p_weight
     
