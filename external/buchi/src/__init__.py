@@ -1,13 +1,13 @@
 #coding:utf-8
 #This file for setting parameters (パラメータ設定ファイル)
-#Akira Taniguchi 2017/01/18-2018/11/26-
+#Akira Taniguchi 2017/01/18-2018/11/27-
 import numpy as np
 
 ####################パス設定####################
 #出力フォルダのパス設定
-datafolder   = "/external/buchi/data/"              #/home/yuki/catkin_ws/src/buchi/data/
-CNNfolder = '/home/yuki/SpCoSLAM-master/PlaceCNN/'  #Folder of CNN model files
-datasetfolder = "/catkin_ws/src/buchi/data/"        #May be the same as datafolder
+datafolder    = "/home/*/SpCoSLAM_Lets/external/buchi/data/"        #PATH of data out put folder  /home/yuki/catkin_ws/src/buchi/data/
+CNNfolder     = "/home/*/CNN/CNN_Places365/"                        #Folder of CNN model files
+datasetfolder = "/home/*/SpCoSLAM_Lets/catkin_ws/src/buchi/data/"   #May be the same as datafolder
 
 ####################パラメータ####################
 R = 30                    #場所概念側のパーティクル数(gmappingを起動するlaunchファイルの設定の値と合わせる必要あり：未設定時は30)
@@ -53,10 +53,10 @@ elif CNNmode == 2:
   Descriptor = "CNN_fc6"
   DimImg = 4096 #画像特徴の次元数（高次元）
 elif CNNmode == 3:
-  Descriptor = "CNN_Place205"
+  Descriptor = "CNN_Places205"
   DimImg = 205  #画像特徴の次元数
 elif CNNmode == 4:
-  Descriptor = "CNN_Place365"
+  Descriptor = "CNN_Places365"
   DimImg = 365  #画像特徴の次元数
 elif CNNmode == 5:
   Descriptor = "hybridCNN"

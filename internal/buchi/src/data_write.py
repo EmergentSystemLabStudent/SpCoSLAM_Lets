@@ -5,9 +5,10 @@ import sys
 import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Int8
+from __init__ import *
 
-filename = "/home/ubuntu/SpCoSLAM-master/data"
-trialname = "/test/" #sys.argv[1]
+filename = datafolder #"/home/ubuntu/SpCoSLAM-master/data"
+trialname = "/test/" #sys.argv[1] #外部から取得できるようにすべき
 mcount = "0"
 
 """

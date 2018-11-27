@@ -36,7 +36,7 @@ void speech_callback(const std_msgs::String::ConstPtr& msg) {
 	//csvファイル出力
 	const char *file_name;
 	if(i==0) {
-		temp = "/home/ubuntu/catkin_ws/src/buchi/data/spco_speech.csv";
+		temp = "/home/ubuntu/catkin_ws/src/buchi/data/spco_speech.csv"; /////////////////////
 		std::cout << temp << std::endl;
 	}
 	file_name = temp.c_str();
