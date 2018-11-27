@@ -6,10 +6,10 @@ from std_msgs.msg import String
 from std_msgs.msg import Int8
 from sensor_msgs.msg import LaserScan
 # import numpy as np
-# from __init__ import *
+from __init__ import *
 
-trialname = 'test'
-datafolder = '/home/ubuntu/SpCoSLAM-master/data/'
+trialname = 'test' #外部から取得できるようにすべき
+#datafolder = '/home/ubuntu/SpCoSLAM-master/data/'
 
 class CSV_SEND(object):
 
