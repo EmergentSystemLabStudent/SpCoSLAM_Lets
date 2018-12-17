@@ -1,6 +1,6 @@
 #coding:utf-8
 #This file for general modules (一般性の高い関数はこちらへ集約)
-#Akira Taniguchi 2018/11/26-
+#Akira Taniguchi 2018/11/26-2018/12/17-
 import os
 import numpy as np
 from math import pi as PI
@@ -13,6 +13,9 @@ def Makedir(dir):
     except:
         pass
         
+def fill_param(param, default):   ##パラメータをNone の場合のみデフォルト値に差し替える関数
+    if (param == None): return default
+    else: return param
         
 def multivariate_t_distribution(x, mu, Sigma, df):
     """
@@ -97,3 +100,32 @@ def PosteriorParameterGIW(k,nk,step,IT,XT,icitems_k0):
     VN = V0
   
   return kN,mN,nN,VN
+
+#http://nbviewer.ipython.org/github/fonnesbeck/Bios366/blob/master/notebooks/Section5_2-Dirichlet-Processes.ipynb
+def stick_breaking(alpha, k):
+    betas = np.random.beta(1, alpha, k)
+    remaining_pieces = np.append(1, np.cumprod(1 - betas[:-1]))
+    p = betas * remaining_pieces
+    return p/p.sum()
+
+
+def levenshtein_distance(a, b):
+    m = [ [0] * (len(b) + 1) for i in range(len(a) + 1) ]
+
+    for i in xrange(len(a) + 1):
+        m[i][0] = i
+
+    for j in xrange(len(b) + 1):
+        m[0][j] = j
+
+    for i in xrange(1, len(a) + 1):
+        for j in xrange(1, len(b) + 1):
+            if a[i - 1] == b[j - 1]:
+                x = 0
+            else:
+                x = 1
+            m[i][j] = min(m[i - 1][j] + 1, m[i][ j - 1] + 1, m[i - 1][j - 1] + x)
+    # print m
+    return m[-1][-1]
+
+    

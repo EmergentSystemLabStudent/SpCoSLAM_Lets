@@ -77,7 +77,7 @@ from math import pi as PI
 from math import cos,sin,sqrt,exp,log,fabs,fsum,degrees,radians,atan2,gamma,lgamma
 #from sklearn.cluster import KMeans
 from __init__ import *
-import modules
+import submodules
 
 
 # Reading data for image feature
