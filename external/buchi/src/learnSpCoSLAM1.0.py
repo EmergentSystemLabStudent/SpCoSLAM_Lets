@@ -4,31 +4,31 @@
 # SpCoSLAM: Online learning program for mobile robots
 #           without language acquisition (WFST speech recognition, 
 #           unsupervised word segmentation and updating language model)
-# Akira Taniguchi 2017/01/18-2017/02/02-2017/02/15-2017/02/21-2018/11/26-
+# Akira Taniguchi 2017/01/18-2017/02/02-2017/02/15-2017/02/21-2018/11/26-2018/12/22
 #####################################################################
 
-##########---処理の流れ（gmapping側）---##########
-#これまでのすべての時刻のパーティクル情報（index,自己位置座標、重み、前時刻のindex）を毎フレーム、ファイル出力
+##########---Process Flow (in gmapping side)---##########
+# Particle information of all the time so far (index, self-position coordinates, weight, index at the previous time) is output every frame, file output
 
-#教示のフラグが立つ
-##フラグ処理
-###重みのファイルが読み込めるまでリサンプリングのコードまで進まない
-###読み込めたら重み更新して次へ進む
-###フラグを切る
+# When teaching flag becomes true by spatial concept learning, 
+# Process for flag is performed in gmapping
+# If weight file is read, go next to codes for resampling.
+# Update weights by process of FastSLAM
+# Teaching flag is changed to false.
 
 
-##########---処理の流れ（Pythonプログラム側）---##########
-#教示時刻のフラグよりPythonプログラムが呼び出される
+##########---Process Flow (in Python codes)---##########
+# The Python program is called from the teaching time flag
 
-#音声認識（別プログラム）->認識結果のデータを読み込み->BoW化
-#画像取得、特徴抽出（別プログラム）->画像特徴（CNNの出力結果）を読み込み->BoW化
-#（事前に音声認識結果データとCNN特徴データを読み込み可能にしておくこと）
+#音声認識 (別プログラム) ->認識結果のデータを読み込み->BoW化
+#画像取得、特徴抽出 (別プログラム) ->画像特徴 (CNNの出力結果) を読み込み->BoW化
+# (事前に音声認識結果データとCNN特徴データを読み込み可能にしておくこと) 
 
 #gmapping側が出力した情報の読み込み
-##現在時刻のパーティクル情報（index,自己位置座標、重み、前時刻のindex）を取得（ファイル読み込み）
+##現在時刻のパーティクル情報 (index,自己位置座標、重み、前時刻のindex) を取得 (ファイル読み込み) 
 
 #過去の教示時刻のパーティクル情報の読み込み
-##パーティクルの時刻ごとのindex対応付け処理（前回の教示のどのパーティクルIDが今回のIDなのか）
+##パーティクルの時刻ごとのindex対応付け処理 (前回の教示のどのパーティクルIDが今回のIDなのか) 
 ##x_{0:t}を情報整理して得る
 
 #パーティクルごとに計算
@@ -36,8 +36,8 @@
 ##it,Ctをサンプリング
 ### 単語、画像特徴、場所概念index、位置分布indexのカウント数の計算
 ### スチューデントt分布の計算
-##画像の重みwfを計算（サンプリング時に計算済み）
-##単語の重みwsを計算（サンプリング時に計算済み）
+##画像の重みwfを計算 (サンプリング時に計算済み) 
+##単語の重みwsを計算 (サンプリング時に計算済み) 
 ##重みの掛け算wt=wz*wf*ws
 
 #重みの正規化wt
@@ -47,6 +47,7 @@
 
 
 ##########---遂行タスク---##########
+###Fast SLAMの方の重みが強く効く可能性が高い。→できるだけ毎回場所概念側もリサンプリング？
 #ファイル構造の整理
 #動作確認
 
@@ -56,9 +57,6 @@
 #[2.0]場所概念の重みにit,ctの項を追加(Akira Taniguchi 2018/11/26)
 #重みの計算のnumpy化を促進、bagfix確認済み(Akira Taniguchi 2018/11/26)
 #PosteriorParameterGIW (Akira Taniguchi 2018/11/26)
-
-##########---保留---##########
-#Fast SLAMの方の重みが強く効く可能性が高い
 
 
 ##############################################
@@ -77,7 +75,7 @@ from math import pi as PI
 from math import cos,sin,sqrt,exp,log,fabs,fsum,degrees,radians,atan2,gamma,lgamma
 #from sklearn.cluster import KMeans
 from __init__ import *
-import submodules
+from submodules import *
 
 
 # Reading data for image feature
@@ -87,7 +85,6 @@ def ReadImageData(trialname, step):
     for line in open( datafolder + trialname + '/img/ft' + str(s+1) + '.csv', 'r'):
       itemList = line[:].split(',')
     FT.append( [float(itemList[i]) for i in xrange(DimImg)] )
-  
   return FT
   
 """
@@ -164,7 +161,7 @@ def ReadWordData(step, filename, particle):
       return W_list, Otb_BOW
 
 
-#itとCtのデータを読み込む（教示した時刻のみ）
+#itとCtのデータを読み込む (教示した時刻のみ) 
 def ReaditCtData(trialname, step, particle):
   CT,IT = [],[]
   if (step != 1):  #最初のステップ以外
@@ -217,7 +214,7 @@ def ParticleSearcher(trialname):
   p = [[Particle( int(0), float(1), float(2), float(3), float(4), int(5) ) for i in xrange(R)] for c in xrange(m_count)]  ##ちゃんと初期化する
   for c in xrange(m_count):
     p[c] = ReadParticleData(c+1, trialname)        #m_countのindexは1から始まる   
-    ######非効率なので、前回のパーティクル情報を使う（未実装）
+    ######非効率なので、前回のパーティクル情報を使う (未実装) 
   
   p_trajectory = [ [Particle( int(0), float(1), float(2), float(3), float(4), int(5) ) for c in xrange(m_count)] for i in xrange(R) ]  ##ちゃんと初期化する
   CT = [ [0 for s in xrange(step-1)] for i in xrange(R) ]
@@ -259,7 +256,7 @@ def ParticleSearcher(trialname):
   return X_To, step, m_count, CT, IT
 
 
-#gmappingの時刻カウント数（m_count）と教示時刻のステップ数（step）を対応付ける
+#gmappingの時刻カウント数 (m_count) と教示時刻のステップ数 (step) を対応付ける
 def m_count2step(trialname, m_count):
   list= []  #[ [m_count, step], ... ]
   step = 1
@@ -306,7 +303,7 @@ def WriteWordData(filename, particle, W_list_i):
     fp.write(W_list_i[w]+",")
   fp.close()
 
-#重み（log）を保存（gmapping読み込み用）
+#重み (log) を保存 (gmapping読み込み用) 
 def WriteWeightData(trialname, m_count, p_weight_log):
   fp = open( datafolder + trialname + "/weight/" + str(m_count) + ".csv", 'w')
   for r in xrange(R):
@@ -379,7 +376,7 @@ def SaveParameters(filename, particle, phi, pi, W, theta, mu, sig):
 def WordDictionaryUpdate(step, filename, W_list):
   LIST = []
   LIST_plus = []
-  #i_best = len(W_list[MAX_Samp])    ##相互情報量上位の単語をどれだけ使うか（len(W_list)：すべて）
+  #i_best = len(W_list[MAX_Samp])    ##相互情報量上位の単語をどれだけ使うか (len(W_list)：すべて) 
   i_best = len(W_list)
   #W_list = W_list[MAX_Samp]
   hatsuon = [ "" for i in xrange(i_best) ]
@@ -473,7 +470,7 @@ def WordDictionaryUpdate(step, filename, W_list):
 def Learning(step, filename, particle, XT, ST, W_list, CT, IT, FT):
     np.random.seed()
     ########################################################################
-    ####                       ↓Learning phase↓                       ####
+    ####                   　    ↓Learning phase↓                       ####
     ########################################################################
     print u"- <START> Learning of Spatial Concepts in Particle:" + str(particle) + " -"
     ##sampling ct and it
@@ -571,7 +568,7 @@ def Learning(step, filename, particle, XT, ST, W_list, CT, IT, FT):
         #print "tpdf",k,tpdf[k][0]
         
       
-      #ctとitの組をずらっと横に並べる（ベクトル）->2次元配列で表現 (temp[L+1][K+1]) [L=new][K=exist]は0
+      #ctとitの組をずらっと横に並べる (ベクトル) ->2次元配列で表現 (temp[L+1][K+1]) [L=new][K=exist]は0
       #temp2 = np.array([[10.0**10 * tpdf[i][0] * CRP_ITC[c][i] * CRP_CT[c] for i in xrange(K+1)] for c in xrange(L+1)])
       print "--------------------" #####
       #print temp2 #####
@@ -621,7 +618,7 @@ def Learning(step, filename, particle, XT, ST, W_list, CT, IT, FT):
       #print temp
       cxi_index = list(multinomial(1,temp)).index(1)
       
-      #1次元配列のindexを2次元配列に戻す（Ctとitに分割する）
+      #1次元配列のindexを2次元配列に戻す (Ctとitに分割する) 
       C,I = cxi_index_list[cxi_index]
       #print C,I
       
@@ -721,7 +718,7 @@ def Learning(step, filename, particle, XT, ST, W_list, CT, IT, FT):
       psc = np.sum(St_prob * CRP_CT)#sum( [St_prob[c] * CRP_CT[c] for c in xrange(L+1)] )
       #if (UseLM == 1):
       if(1):
-        #単なる単語の生起確率（頻度+βによるスムージング）:P(St|S{1:t-1},β)
+        #単なる単語の生起確率 (頻度+βによるスムージング) :P(St|S{1:t-1},β)
         Ng = sum([np.array(ST[s]) for s in xrange(step-1)])  #sumだとできる
         W_temp2_log = np.log(np.array(Ng) + beta0 ) - log(sum(Ng) + G*beta0)
         ps_log = sum(np.array(W_temp2_log) * np.array(ST[cstep]))
@@ -738,14 +735,14 @@ def Learning(step, filename, particle, XT, ST, W_list, CT, IT, FT):
       
       
     ########################################################################
-    ####                       ↑Learning phase↑                       ####
+    ####      　                 ↑Learning phase↑                       ####
     ########################################################################
     
     ########  ↓File Output of Learning Result↓  ########
     if SaveParam == 1:
         #最終学習結果を出力(ファイルに保存)
         SaveParameters(filename, particle, phi, pi, W, theta, MU, SIG)
-        ###実際のindex番号と処理上のindex番号の対応付けを保存（場所概念パラメータΘは処理上の順番）
+        ###実際のindex番号と処理上のindex番号の対応付けを保存 (場所概念パラメータΘは処理上の順番) 
         WriteIndexData(filename, particle, ccitems, icitems,ct,it)
     ########  ↑File Output of Learning Result↑  ########
     #print "--------------------"
@@ -773,8 +770,8 @@ if __name__ == '__main__':
     rospy.init_node('learn_SpCoSLAM')
     
     
-    #trialname は上位プログラム（シェルスクリプト）から送られる
-    #上位プログラムがファイル作成も行う（最初だけ）
+    #trialname は上位プログラム (シェルスクリプト) から送られる
+    #上位プログラムがファイル作成も行う (最初だけ) 
     trialname = sys.argv[1]
     print trialname
     
@@ -882,7 +879,7 @@ if __name__ == '__main__':
 
     gwait_pub.publish(str(m_count+1))
 
-    ###new_place_draw_online.pyを実行（trialname 教示回数 particleのID）
+    ###new_place_draw_online.pyを実行 (trialname 教示回数 particleのID) 
     drawplace = "python ./new_place_draw_online.py "+trialname+" "+str(step)+" "+str(0) #+" "+str(particle[s][0])+" "+str(particle[s][1])
     p2 = subprocess.Popen(drawplace, shell=True)
     print "END of Spatial Concept Learning in this step. "+trialname+" "+str(step) # drawplace
